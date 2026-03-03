@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:flowable
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+flowable:
+  rest:
+    app:
+      swagger-docs-enabled: true
+    enabled: true
+  async-executor-activate: true

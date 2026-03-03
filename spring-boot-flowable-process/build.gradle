@@ -1,0 +1,34 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.5.7'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'by.kominch'
+version = '1.0-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation platform("org.flowable:flowable-bom:7.2.0")
+    implementation "org.flowable:flowable-spring-boot-starter"
+    implementation "org.flowable:flowable-spring-boot-starter-rest"
+    implementation "org.flowable:flowable-spring-boot-starter-process"
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0"
+
+    implementation "org.springframework.boot:spring-boot-starter-web"
+
+    runtimeOnly "com.h2database:h2:2.2.224"
+}
+
+test {
+    useJUnitPlatform()
+}
