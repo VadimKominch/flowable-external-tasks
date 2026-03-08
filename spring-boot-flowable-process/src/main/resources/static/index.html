@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://unpkg.com/bpmn-visualizer/dist/bpmn-visualizer.min.js"></script>
+</head>
+
+<body>
+
+<h3>Process Viewer</h3>
+
+<input id="businessKey" placeholder="Enter business key"/>
+<button onclick="loadProcess()">Load</button>
+
+<div id="bpmn-container" style="height:600px;border:1px solid gray;"></div>
+
+<script>
+
+    const visualizer = new BpmnVisualizer({
+        container: "bpmn-container"
+    })
+
+    async function loadProcess() {
+
+        const businessKey = document.getElementById("businessKey").value
+
+        const response = await fetch(`/api/process/${businessKey}`)
+        const data = await response.json()
+
+        await visualizer.load(data.bpmnXml)
+
+        visualizer.bpmnElementsRegistry.addCssClasses(data.activeActivities, {
+            className: "active"
+        })
+    }
+
+</script>
+
+<style>
+    .active .djs-visual > :nth-child(1) {
+        stroke: red;
+        stroke-width: 5px;
+    }
+</style>
+
+</body>
+</html>
