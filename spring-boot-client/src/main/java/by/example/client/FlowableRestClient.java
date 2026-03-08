@@ -1,7 +1,6 @@
 package by.example.client;
 
-import by.example.client.dto.FetchAndLockRequest;
-import by.example.client.dto.FlowableVariable;
+import by.example.client.dto.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -55,5 +54,32 @@ public class FlowableRestClient {
                 .body(Map.of("workerId", workerId,"variables", variables))
                 .retrieve()
                 .toBodilessEntity();
+    }
+
+    public ProcessInstanceQueryResponse getProcessInstanceId(String businessKey) {
+        return restClient.get()
+                .uri("/runtime/process-instances","businessKey",businessKey)
+                .retrieve()
+                .body(ProcessInstanceQueryResponse.class);
+    }
+
+    public ExecutionQueryResponse getExecutions(String processInstanceId, String messageName) {
+        return restClient.get()
+            .uri(uriBuilder -> uriBuilder
+                .path("/runtime/executions")
+                .queryParam("processInstanceId", processInstanceId)
+                .queryParam("messageEventSubscriptionName", messageName)
+                .build())
+            .retrieve()
+            .body(ExecutionQueryResponse.class);
+    }
+
+    public void correlateMessage(String executionId, String messageName) {
+        MessageCorrelationRequest request = MessageCorrelationRequest.messageReceived(messageName, List.of());
+        restClient.put()
+                .uri("/runtime/executions/{executionId}", executionId)
+                .body(request)
+                .retrieve()
+                .body(String.class);
     }
 }

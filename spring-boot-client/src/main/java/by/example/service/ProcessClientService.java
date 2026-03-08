@@ -14,6 +14,9 @@ public class ProcessClientService {
     private static final String EXTERNAL_TASK_WORKER_ID = UUID.randomUUID().toString();
     public static final String PRINT_TOPIC = "print-topic";
     public static final String HELLO_TOPIC = "hello-topic";
+    public static final String ERROR_TOPIC = "error-topic";
+    public static final String THROW_ERROR_TOPIC = "throw-error-topic";
+    public static final String THROW_ERROR_2_TOPIC = "throw-error-2-topic";
     private final FlowableRestClient restClient;
     private final List<DelegateExternalTask> externalTasks;
 
@@ -29,6 +32,87 @@ public class ProcessClientService {
         restClient.startProcess(EXTERNAL_TASK_DEFINITION_KEY, businessKey);
 
         return businessKey;
+    }
+
+    public void correlateMessage(String businessKey, String messageName) {
+        System.out.println("correlateMessage businessKey is " + businessKey);
+        var processInstanceQueryResponse = restClient.getProcessInstanceId(businessKey);
+        if (processInstanceQueryResponse == null || processInstanceQueryResponse.data().isEmpty()) {
+            throw new IllegalStateException(
+                    "No execution waiting for message=" + messageName +
+                            " processInstance=" + businessKey);
+        }
+        String processInstanceId = processInstanceQueryResponse.data().getFirst().id();
+        var executionResponse = restClient.getExecutions(processInstanceId, messageName);
+
+        String executionId = executionResponse.data().getFirst().id();
+        restClient.correlateMessage(executionId, messageName);
+    }
+
+    @Scheduled(fixedRate = 5000, scheduler = "flowablePool")
+    public void throwError2TaskProcess() {
+        List<?> errorTopicTasks = restClient.getTasks(EXTERNAL_TASK_WORKER_ID, THROW_ERROR_2_TOPIC);
+        List<Map<String, Object>> tasks = new ArrayList<>();
+        tasks.addAll((Collection<? extends Map<String, Object>>) errorTopicTasks);
+
+
+        if (tasks.isEmpty()) {
+            return;
+        }
+
+        for (Map task : tasks) {
+            String taskId = (String) task.get("id");
+            System.out.println("Task " + taskId);
+            processTask(taskId, externalTasks
+                            .stream()
+                            .filter(el -> el.getTopicName().equals(THROW_ERROR_2_TOPIC))
+                            .findFirst().get(),
+                    List.of());
+        }
+    }
+
+    @Scheduled(fixedRate = 5000, scheduler = "flowablePool")
+    public void throwErrorTaskProcess() {
+        List<?> errorTopicTasks = restClient.getTasks(EXTERNAL_TASK_WORKER_ID, THROW_ERROR_TOPIC);
+        List<Map<String, Object>> tasks = new ArrayList<>();
+        tasks.addAll((Collection<? extends Map<String, Object>>) errorTopicTasks);
+
+
+        if (tasks.isEmpty()) {
+            return;
+        }
+
+        for (Map task : tasks) {
+            String taskId = (String) task.get("id");
+            System.out.println("Task " + taskId);
+            processTask(taskId, externalTasks
+                            .stream()
+                            .filter(el -> el.getTopicName().equals(THROW_ERROR_TOPIC))
+                            .findFirst().get(),
+                    List.of(new FlowableVariable("subprocessProcess", "string", "FAIL")));
+        }
+    }
+
+    @Scheduled(fixedRate = 5000, scheduler = "flowablePool")
+    public void errorTaskProcess() {
+        List<?> errorTopicTasks = restClient.getTasks(EXTERNAL_TASK_WORKER_ID, ERROR_TOPIC);
+        List<Map<String, Object>> tasks = new ArrayList<>();
+        tasks.addAll((Collection<? extends Map<String, Object>>) errorTopicTasks);
+
+
+        if (tasks.isEmpty()) {
+            return;
+        }
+
+        for (Map task : tasks) {
+            String taskId = (String) task.get("id");
+            System.out.println("Task " + taskId);
+            processTask(taskId, externalTasks
+                            .stream()
+                            .filter(el -> el.getTopicName().equals(ERROR_TOPIC))
+                            .findFirst().get(),
+                    List.of());
+        }
     }
 
     // is processed inside
@@ -50,7 +134,7 @@ public class ProcessClientService {
                     .stream()
                     .filter(el -> el.getTopicName().equals(PRINT_TOPIC))
                     .findFirst().get(),
-                    List.of(new FlowableVariable("result", "string", "SUCCESS")));
+                    List.of(new FlowableVariable("result", "string", "FAIL")));
         }
     }
 
