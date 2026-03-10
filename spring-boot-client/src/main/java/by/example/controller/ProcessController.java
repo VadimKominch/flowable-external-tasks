@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 @RestController
 public class ProcessController {
 
@@ -17,7 +19,8 @@ public class ProcessController {
 
     @PostMapping
     public String startProcess() {
-        return processClientService.startProcess();
+        String businessKey = UUID.randomUUID().toString();
+        return processClientService.startProcess(businessKey);
     }
 
     @PostMapping("/correlate")

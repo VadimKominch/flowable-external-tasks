@@ -38,7 +38,7 @@ public class FlowableRestClient {
     public List<?> getTasks(String workerId, String topic) {
         FetchAndLockRequest request = new FetchAndLockRequest();
         request.setWorkerId(workerId);
-        request.setLockDuration("PT10S");
+        request.setLockDuration("PT30S");
         request.setTopic(topic);
 
         return externalJobRestClient.post()
