@@ -1,4 +1,4 @@
-package by.example.client.config;
+package by.example.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.task.TaskDecorator;

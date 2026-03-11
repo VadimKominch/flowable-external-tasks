@@ -1,4 +1,4 @@
-package by.example.service.jobworker;
+package by.example.process.jobworker;
 
 import by.example.service.ProcessClientService;
 import org.springframework.scheduling.annotation.Scheduled;

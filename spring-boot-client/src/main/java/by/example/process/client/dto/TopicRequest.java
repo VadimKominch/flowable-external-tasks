@@ -1,4 +1,4 @@
-package by.example.client.dto;
+package by.example.process.client.dto;
 
 public class TopicRequest {
     private String topicName;

@@ -1,7 +1,7 @@
 package by.example.service;
 
-import by.example.client.FlowableRestClient;
-import by.example.client.dto.FlowableVariable;
+import by.example.process.client.FlowableRestClient;
+import by.example.process.client.dto.FlowableVariable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;

@@ -1,4 +1,4 @@
-package by.example.client.config;
+package by.example.process.client.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
