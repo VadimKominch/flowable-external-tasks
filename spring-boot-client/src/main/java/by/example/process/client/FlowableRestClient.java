@@ -1,8 +1,6 @@
 package by.example.process.client;
 
-import by.example.client.dto.*;
 import by.example.process.client.dto.*;
-import by.example.process.jobworker.client.dto.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;

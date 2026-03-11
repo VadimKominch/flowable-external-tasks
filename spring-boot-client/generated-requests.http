@@ -8,7 +8,7 @@ POST http://localhost:8778/correlate
 Content-Type: application/json
 
 {
-  "businessKey": "5bca91d0-c2c9-4a80-b4f1-9fd3119cd1b5",
+  "businessKey": "180693ec-55f2-4047-8cb3-9501f79a3222",
   "messageName": "TestMessage"
 }
 

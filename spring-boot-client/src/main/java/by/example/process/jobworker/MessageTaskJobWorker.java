@@ -34,7 +34,7 @@ public class MessageTaskJobWorker {
         for (Map task : tasks) {
             String taskId = (String) task.get("id");
             // business logic
-            System.out.println("processingg message");
+            System.out.println("processing message");
             // end of business logic
             processService.completeTask(
                     EXTERNAL_TASK_WORKER_ID,
