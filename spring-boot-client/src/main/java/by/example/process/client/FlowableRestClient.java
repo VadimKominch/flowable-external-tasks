@@ -2,9 +2,11 @@ package by.example.process.client;
 
 import by.example.process.client.dto.*;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -23,16 +25,36 @@ public class FlowableRestClient {
 
     public void startProcess(String processDefinitionKey, String businessKey) {
 
+        List<StartProcessInstanceVariable> variables = new ArrayList<>(){{
+            add(new StartProcessInstanceVariable("processId", "string", businessKey));
+        }};
         Map<String, Object> request = Map.of(
                 "processDefinitionKey", processDefinitionKey,
-                "businessKey", businessKey
+                "businessKey", businessKey,
+                "variables", variables
         );
 
-        restClient.post()
+        var result = restClient.post()
                 .uri("/runtime/process-instances")
                 .body(request)
                 .retrieve()
                 .body(String.class);
+        System.out.println(result);
+    }
+
+    public List<StartProcessInstanceVariable> getVariables(String processInstanceId) {
+        return restClient.get()
+                .uri("/runtime/process-instances/{processInstanceId}/variables", processInstanceId)
+                .retrieve()
+                .body(new ParameterizedTypeReference<>() {});
+    }
+
+    public void setVariables(String processInstanceId, List<StartProcessInstanceVariable> variables) {
+        restClient.post()
+                .uri("/runtime/process-instances/{processInstanceId}/variables", processInstanceId)
+                .body(variables)
+                .retrieve()
+                .toBodilessEntity();
     }
 
     public List<?> getTasks(String workerId, String topic) {

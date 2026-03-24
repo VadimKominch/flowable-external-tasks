@@ -2,6 +2,7 @@ package by.example.service;
 
 import by.example.process.client.FlowableRestClient;
 import by.example.process.client.dto.FlowableVariable;
+import by.example.process.client.dto.StartProcessInstanceVariable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -42,6 +43,15 @@ public class ProcessClientService {
 
     public List<?> getTasks(String workerId, String topicName) {
         return restClient.getTasks(workerId, topicName);
+    }
+
+    public StartProcessInstanceVariable getVariable(String processId, String variableName) {
+        return restClient
+                .getVariables(processId)
+                .stream()
+                .filter(el -> el.name().equals(variableName))
+                .findFirst()
+                .orElse(null);
     }
 }
 

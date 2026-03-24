@@ -26,16 +26,15 @@ public class PrintTaskJobWorker {
         List<?> helloTopicTasks = processService.getTasks(EXTERNAL_TASK_WORKER_ID, PRINT_TOPIC);
         List<Map<String, Object>> tasks = new ArrayList<>();
         tasks.addAll((Collection<? extends Map<String, Object>>) helloTopicTasks);
-
-
         if (tasks.isEmpty()) {
             return;
         }
 
         for (Map task : tasks) {
             String taskId = (String) task.get("id");
+            var variable = processService.getVariable((String)task.get("processInstanceId"), "processId");
             // business logic
-            System.out.println("print");
+            System.out.println("print from process with process instance id" + variable );
 
             processService.completeTask(
                     EXTERNAL_TASK_WORKER_ID,
