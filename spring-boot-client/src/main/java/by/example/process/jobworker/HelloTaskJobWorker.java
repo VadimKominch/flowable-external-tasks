@@ -1,46 +1,25 @@
 package by.example.process.jobworker;
 
+import by.example.process.client.dto.JobDto;
 import by.example.service.ProcessClientService;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
 @Component
-public class HelloTaskJobWorker {
+public class HelloTaskJobWorker extends AbstractTask {
     public static final String HELLO_TOPIC = "hello-topic";
-    private static final String EXTERNAL_TASK_WORKER_ID = "123456789";
 
-    private final ProcessClientService processService;
 
     public HelloTaskJobWorker(ProcessClientService processService) {
-        this.processService = processService;
+        super(processService);
     }
 
-    @Scheduled(fixedRate = 5000, scheduler = "flowablePool")
-    public void helloTaskProcess() {
-        List<?> helloTopicTasks = processService.getTasks(EXTERNAL_TASK_WORKER_ID, HELLO_TOPIC);
-        List<Map<String, Object>> tasks = new ArrayList<>();
-        tasks.addAll((Collection<? extends Map<String, Object>>) helloTopicTasks);
+    @Override
+    public String getTopic() {
+        return HELLO_TOPIC;
+    }
 
-
-        if (tasks.isEmpty()) {
-            return;
-        }
-
-        for (Map task : tasks) {
-            String taskId = (String) task.get("id");
-            // business logic
-            System.out.println("hello");
-
-            processService.completeTask(
-                    EXTERNAL_TASK_WORKER_ID,
-                    taskId,
-                    List.of()
-            );
-        }
+    @Override
+    public void execute(JobDto task) throws Exception {
+        System.out.println("hello");
     }
 }

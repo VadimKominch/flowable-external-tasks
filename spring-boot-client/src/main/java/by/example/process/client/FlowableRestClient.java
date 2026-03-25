@@ -25,8 +25,8 @@ public class FlowableRestClient {
 
     public void startProcess(String processDefinitionKey, String businessKey) {
 
-        List<StartProcessInstanceVariable> variables = new ArrayList<>(){{
-            add(new StartProcessInstanceVariable("processId", "string", businessKey));
+        List<ProcessInstanceVariable> variables = new ArrayList<>(){{
+            add(new ProcessInstanceVariable("processId", "string", businessKey));
         }};
         Map<String, Object> request = Map.of(
                 "processDefinitionKey", processDefinitionKey,
@@ -42,14 +42,14 @@ public class FlowableRestClient {
         System.out.println(result);
     }
 
-    public List<StartProcessInstanceVariable> getVariables(String processInstanceId) {
+    public List<ProcessInstanceVariable> getVariables(String processInstanceId) {
         return restClient.get()
                 .uri("/runtime/process-instances/{processInstanceId}/variables", processInstanceId)
                 .retrieve()
                 .body(new ParameterizedTypeReference<>() {});
     }
 
-    public void setVariables(String processInstanceId, List<StartProcessInstanceVariable> variables) {
+    public void setVariables(String processInstanceId, List<ProcessInstanceVariable> variables) {
         restClient.post()
                 .uri("/runtime/process-instances/{processInstanceId}/variables", processInstanceId)
                 .body(variables)
@@ -57,7 +57,7 @@ public class FlowableRestClient {
                 .toBodilessEntity();
     }
 
-    public List<?> getTasks(String workerId, String topic) {
+    public List<JobDto> getTasks(String workerId, String topic) {
         FetchAndLockRequest request = new FetchAndLockRequest();
         request.setWorkerId(workerId);
         request.setLockDuration("PT30S");
@@ -67,7 +67,7 @@ public class FlowableRestClient {
                 .uri("/acquire/jobs")
                 .body(request)
                 .retrieve()
-                .body(List.class);
+                .body(new ParameterizedTypeReference<>() {});
     }
 
     public void complete(String workerId, String taskId, List<FlowableVariable> variables) {
