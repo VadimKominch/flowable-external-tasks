@@ -78,6 +78,14 @@ public class FlowableRestClient {
                 .toBodilessEntity();
     }
 
+    public void fail(String workerId, String taskId, List<FlowableVariable> variables, int remainingRetries) {
+        externalJobRestClient.post()
+                .uri("/acquire/jobs/{jobId}/fail", taskId)
+                .body(Map.of("workerId", workerId,"variables", variables, "retries", remainingRetries))
+                .retrieve()
+                .toBodilessEntity();
+    }
+
     public ProcessInstanceQueryResponse getProcessInstanceId(String businessKey) {
         return restClient.get()
                 .uri("/runtime/process-instances","businessKey",businessKey)

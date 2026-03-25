@@ -41,6 +41,10 @@ public class ProcessClientService {
         restClient.complete(workerId, taskId, variables);
     }
 
+    public void failTask(String workerId, String taskId, List<FlowableVariable> variables, int remainingRetries) {
+        restClient.fail(workerId, taskId, variables, remainingRetries);
+    }
+
     public List<?> getTasks(String workerId, String topicName) {
         return restClient.getTasks(workerId, topicName);
     }
