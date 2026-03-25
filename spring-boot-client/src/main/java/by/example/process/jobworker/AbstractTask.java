@@ -6,7 +6,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 public abstract class AbstractTask {
    protected final ProcessClientService processService;
