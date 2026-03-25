@@ -23,11 +23,8 @@ public class FlowableRestClient {
         this.externalJobRestClient = externalJobRestClient;
     }
 
-    public void startProcess(String processDefinitionKey, String businessKey) {
+    public void startProcess(String processDefinitionKey, String businessKey, List<ProcessInstanceVariable> variables) {
 
-        List<ProcessInstanceVariable> variables = new ArrayList<>(){{
-            add(new ProcessInstanceVariable("processId", "string", businessKey));
-        }};
         Map<String, Object> request = Map.of(
                 "processDefinitionKey", processDefinitionKey,
                 "businessKey", businessKey,
@@ -53,6 +50,17 @@ public class FlowableRestClient {
         restClient.post()
                 .uri("/runtime/process-instances/{processInstanceId}/variables", processInstanceId)
                 .body(variables)
+                .retrieve()
+                .toBodilessEntity();
+    }
+
+    public void updateVariable(String processInstanceId, ProcessInstanceVariable variable) {
+        restClient
+                .put()
+                .uri(
+                        "/process-api/runtime/process-instances/{processInstanceId}/variables/{variableName}",
+                        processInstanceId, variable.name())
+                .body(variable)
                 .retrieve()
                 .toBodilessEntity();
     }

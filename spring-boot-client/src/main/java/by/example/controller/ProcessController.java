@@ -23,6 +23,12 @@ public class ProcessController {
         return processClientService.startProcess(businessKey);
     }
 
+    @PostMapping("/timer")
+    public String startTimerProcess() {
+        String businessKey = UUID.randomUUID().toString();
+        return processClientService.startTimerProcess(businessKey);
+    }
+
     @PostMapping("/correlate")
     public String correlateProcess(@RequestBody ProcessCorrelateRequest request) {
         processClientService.correlateMessage(request.businessKey(), request.messageName());
