@@ -1,2 +1,3 @@
 rootProject.name = 'spring-boot-flowable-external-tasks'
 include 'spring-boot-flowable-process'
+include 'spring-boot-client'

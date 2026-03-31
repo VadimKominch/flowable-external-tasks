@@ -11,3 +11,15 @@ flowable:
       swagger-docs-enabled: true
     enabled: true
   async-executor-activate: true
+  metrics:
+    enabled: true
+    reporter-enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,flowable
+  endpoint:
+    metrics:
+      enabled: true
