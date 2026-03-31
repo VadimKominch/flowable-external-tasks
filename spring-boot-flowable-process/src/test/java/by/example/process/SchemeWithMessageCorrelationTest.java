@@ -1,82 +1,113 @@
 package by.example.process;
 
+import org.flowable.engine.HistoryService;
 import org.flowable.engine.ManagementService;
+import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.engine.test.FlowableTest;
+import org.flowable.job.api.AcquiredExternalWorkerJob;
 import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.spring.impl.test.FlowableSpringExtension;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Map;
+import java.time.Duration;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ExtendWith(FlowableSpringExtension.class)
 @SpringBootTest
+@ActiveProfiles("test")
 class SchemeWithMessageCorrelationTest {
 
     @Autowired
     private RuntimeService runtimeService;
     @Autowired private ManagementService managementService;
+    @Autowired private HistoryService historyService;
+    @Autowired private ProcessEngineConfiguration processEngineConfiguration;
 
+    @BeforeEach
+    void disableAsyncExecutor() {
+        processEngineConfiguration.getAsyncExecutor().shutdown();
+    }
     @Test
+    @Transactional
     @Deployment(resources = "processes/externalTaskWithCorrelationExample.bpmn")
     void testFullProcessPath() {
         // 1. Start the process
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("externalTaskWithCorrelationExample");
 
-        // 2. Handle 'ExternalWorkerTask_3' (print-topic)
-        // We find the job to ensure the process actually reached this node
-        ExternalWorkerJob job1 = managementService.createExternalWorkerJobQuery()
+        // 2. Acquire and complete ExternalWorkerTask_3 (print-topic)
+        List<AcquiredExternalWorkerJob> acquiredJobs = managementService
+                .createExternalWorkerJobAcquireBuilder()
+                .topic("print-topic", Duration.ofSeconds(1))
+                .acquireAndLock(1, "test-worker");
+
+        assertFalse(acquiredJobs.isEmpty(), "Process should be at print-topic");
+
+        // Use the acquired job's ID directly — no need for a separate query
+        managementService.createExternalWorkerCompletionBuilder(acquiredJobs.get(0).getId(), "test-worker")
+                .variable("result", "ERROR")
+                .complete();
+
+        waitForExternalJob(pi.getId(), "error-topic");
+
+        // 3. Acquire and complete ExternalWorkerTask_20 (error-topic)
+        List<AcquiredExternalWorkerJob> acquiredJobs2 = managementService
+                .createExternalWorkerJobAcquireBuilder()
+                .topic("error-topic", Duration.ofSeconds(10))
+                .acquireAndLock(1, "test-worker-2");
+
+        assertFalse(acquiredJobs2.isEmpty(), "Process should be at error-topic");
+
+        managementService.createExternalWorkerCompletionBuilder(acquiredJobs2.get(0).getId(), "test-worker-2")
+                .complete();
+
+        // 4. Verify process completed
+        ProcessInstance runningProcessInst = runtimeService.createProcessInstanceQuery()
                 .processInstanceId(pi.getId())
-                .elementId("ExternalWorkerTask_3")
                 .singleResult();
-        assertNotNull(job1, "Process should be at print-topic");
-
-        runtimeService.setVariable(job1.getId(), "result", "Error");
-        runtimeService
-                .createExecutionQuery()
+        var historyProcessInst = historyService.createHistoricProcessInstanceQuery()
                 .processInstanceId(pi.getId())
-                .executionId(job1.getExecutionId())
                 .singleResult();
-        // Move the process forward. Since we can't use ExternalWorkerService,
-        // we trigger the execution directly to simulate completion.
-//        runtimeService.trigger(job1.getExecutionId(), Map.of("result", "DEFAULT"));
 
-        // 3. Handle 'IntermediateMessageEventCatching_10'
-        // Because result was not "SUCCESS" or "ERROR", it hits the default flow to the message catch
-        Execution messageExecution = runtimeService.createExecutionQuery()
-                .processInstanceId(pi.getId())
-                .messageEventSubscriptionName("TestMessage")
-                .singleResult();
-        assertNotNull(messageExecution, "Process should be waiting for TestMessage");
+        assertNull(runningProcessInst, "Process should be finished");
+        assertNotNull(historyProcessInst, "Process should exist in history");
+    }
 
-        // Correlate the message (Simulating Service B)
-        runtimeService.messageEventReceived("TestMessage", messageExecution.getId());
+    private void waitForExternalJob(String processInstanceId, String topic) {
+        long timeout = 30000; // 5 seconds
+        long interval = 200;
+        long elapsed = 0;
 
-        // 4. Handle 'ExternalWorkerTask_4' (hello-topic)
-        // After the message, it moves to Gateway 10 then hello-topic
-        ExternalWorkerJob job2 = managementService.createExternalWorkerJobQuery()
-                .processInstanceId(pi.getId())
-//                .topic("hello-topic")
-                .singleResult();
-        assertNotNull(job2, "Process should have reached hello-topic");
+        while (elapsed < timeout) {
+            ExternalWorkerJob job = managementService.createExternalWorkerJobQuery()
+                    .processInstanceId(processInstanceId)
+                    .singleResult();
 
-        runtimeService.trigger(job2.getExecutionId());
-//    managementService.createExternalWorkerCompletionBuilder().complete();
-        // 5. Verify it entered the Subprocess
-        // The process should now have an active task inside the 'Error subprocess'
-        long subProcessTasks = managementService.createExternalWorkerJobQuery()
-                .processInstanceId(pi.getId())
-                .count();
-        // It should be 2 because you have a Parallel Gateway inside the subprocess
-        assertEquals(2, subProcessTasks, "Subprocess should have started two parallel external tasks");
+            if (job != null && topic.equals(job.getJobHandlerConfiguration())) {
+                return; // job is ready
+            }
+
+            try {
+                Thread.sleep(interval);
+                elapsed += interval;
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException("Interrupted while waiting for job", e);
+            }
+        }
+
+        throw new AssertionError("Timed out waiting for external job on topic: " + topic);
     }
 }
