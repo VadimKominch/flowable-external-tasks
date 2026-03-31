@@ -1,11 +1,11 @@
 package by.example.process;
 
 import org.flowable.engine.ManagementService;
-import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.engine.test.FlowableTest;
 import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.spring.impl.test.FlowableSpringExtension;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,6 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(FlowableSpringExtension.class)
 @SpringBootTest
@@ -27,9 +26,8 @@ class SchemeWithMessageCorrelationTest {
     private RuntimeService runtimeService;
     @Autowired private ManagementService managementService;
 
-
     @Test
-    @Deployment(resources = "externalTaskWithCorrelationExample.bpmn")
+    @Deployment(resources = "processes/externalTaskWithCorrelationExample.bpmn")
     void testFullProcessPath() {
         // 1. Start the process
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("externalTaskWithCorrelationExample");
@@ -38,13 +36,19 @@ class SchemeWithMessageCorrelationTest {
         // We find the job to ensure the process actually reached this node
         ExternalWorkerJob job1 = managementService.createExternalWorkerJobQuery()
                 .processInstanceId(pi.getId())
-//                .topic("print-topic")
+                .elementId("ExternalWorkerTask_3")
                 .singleResult();
         assertNotNull(job1, "Process should be at print-topic");
 
+        runtimeService.setVariable(job1.getId(), "result", "Error");
+        runtimeService
+                .createExecutionQuery()
+                .processInstanceId(pi.getId())
+                .executionId(job1.getExecutionId())
+                .singleResult();
         // Move the process forward. Since we can't use ExternalWorkerService,
         // we trigger the execution directly to simulate completion.
-        runtimeService.trigger(job1.getExecutionId(), Map.of("result", "DEFAULT"));
+//        runtimeService.trigger(job1.getExecutionId(), Map.of("result", "DEFAULT"));
 
         // 3. Handle 'IntermediateMessageEventCatching_10'
         // Because result was not "SUCCESS" or "ERROR", it hits the default flow to the message catch
