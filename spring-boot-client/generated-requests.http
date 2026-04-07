@@ -1,5 +1,5 @@
 ###
-POST http://localhost:8778/
+POST http://localhost:8778/?name=EXCLUSIVE_GATEWAY
 
 <> 2026-03-10T102924.200.txt
 

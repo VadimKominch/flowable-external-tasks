@@ -4,22 +4,22 @@ import by.example.process.client.FlowableRestClient;
 import by.example.process.client.dto.FlowableVariable;
 import by.example.process.client.dto.JobDto;
 import by.example.process.client.dto.ProcessInstanceVariable;
+import by.example.process.entity.ProcessDefinitionKey;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
 public class ProcessClientService {
-    public static final String EXTERNAL_TASK_DEFINITION_KEY = "externalTaskWithCorrelationExample";
     private final FlowableRestClient restClient;
 
     public ProcessClientService(FlowableRestClient restClient) {
         this.restClient = restClient;
     }
 
-    public String startProcess(String businessKey) {
+    public String startProcess(ProcessDefinitionKey processDefinitionKey, String businessKey, List<ProcessInstanceVariable> variables) {
         System.out.println("Business key is " + businessKey);
-        restClient.startProcess(EXTERNAL_TASK_DEFINITION_KEY, businessKey);
+        restClient.startProcess(processDefinitionKey.getSchemeName(), businessKey, variables);
         return businessKey;
     }
 

@@ -23,11 +23,10 @@ public class FlowableRestClient {
         this.externalJobRestClient = externalJobRestClient;
     }
 
-    public void startProcess(String processDefinitionKey, String businessKey) {
+    public void startProcess(String processDefinitionKey, String businessKey, List<ProcessInstanceVariable> variables) {
 
-        List<ProcessInstanceVariable> variables = new ArrayList<>(){{
-            add(new ProcessInstanceVariable("processId", "string", businessKey));
-        }};
+        variables.add(new ProcessInstanceVariable("processId", "string", businessKey));
+
         Map<String, Object> request = Map.of(
                 "processDefinitionKey", processDefinitionKey,
                 "businessKey", businessKey,

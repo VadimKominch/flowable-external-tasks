@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PrintTaskJobWorker extends AbstractTask{
     public static final String PRINT_TOPIC = "print-topic";
+    public static final String PRINT_VAR_VARIABLE = "printVar";
 
     public PrintTaskJobWorker(ProcessClientService processService) {
         super(processService);
@@ -20,6 +21,8 @@ public class PrintTaskJobWorker extends AbstractTask{
     @Override
     public void execute(JobDto task) throws Exception {
         var variable = processService.getVariable(task.processInstanceId(), "processId");
-        System.out.println("print from process with process instance id" + variable );
+        String innerVar = getExecutionVariable(task, PRINT_VAR_VARIABLE);
+        System.out.println("Value of inner variable is " + innerVar);
+        System.out.println("print from process with process instance id" + variable);
     }
 }

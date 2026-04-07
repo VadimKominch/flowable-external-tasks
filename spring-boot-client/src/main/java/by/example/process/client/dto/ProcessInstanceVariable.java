@@ -4,4 +4,4 @@ public record ProcessInstanceVariable(
         String name,
         String type,
         Object value
-) {}
+) { }

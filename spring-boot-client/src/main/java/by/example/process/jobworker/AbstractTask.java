@@ -34,4 +34,12 @@ public abstract class AbstractTask {
             }
         });
     }
+
+    protected <T> T getExecutionVariable(JobDto task, String variableName) {
+        var result = task.variables().stream().filter(el -> el.name().equals(variableName)).toList();
+        if(result.isEmpty()) {
+            return null;
+        }
+        return (T) result.get(0).value();
+    }
 }
