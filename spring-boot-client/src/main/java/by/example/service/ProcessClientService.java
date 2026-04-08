@@ -38,12 +38,13 @@ public class ProcessClientService {
         restClient.correlateMessage(executionId, messageName);
     }
 
-    public void completeTask(String workerId, String taskId, List<FlowableVariable> variables) {
+    public void completeTask(
+            String workerId, String taskId, List<ProcessInstanceVariable> variables) {
         restClient.complete(workerId, taskId, variables);
     }
 
-    public void failTask(String workerId, String taskId, List<FlowableVariable> variables, int remainingRetries) {
-        restClient.fail(workerId, taskId, variables, remainingRetries);
+    public void failTask(String workerId, String taskId, int remainingRetries) {
+        restClient.fail(workerId, taskId, remainingRetries);
     }
 
     public List<JobDto> getTasks(String workerId, String topicName) {

@@ -6,7 +6,6 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -69,18 +68,22 @@ public class FlowableRestClient {
                 .body(new ParameterizedTypeReference<>() {});
     }
 
-    public void complete(String workerId, String taskId, List<FlowableVariable> variables) {
-        externalJobRestClient.post()
-                .uri("/acquire/jobs/{jobId}/complete", taskId)
-                .body(Map.of("workerId", workerId,"variables", variables))
+    public void complete(String workerId, String taskId, List<ProcessInstanceVariable> variables) {
+        var request = new SuccessJobRequestDto(workerId, variables);
+        externalJobRestClient
+                .post()
+                .uri("/external-job-api/acquire/jobs/{jobId}/complete", taskId)
+                .body(request)
                 .retrieve()
                 .toBodilessEntity();
     }
 
-    public void fail(String workerId, String taskId, List<FlowableVariable> variables, int remainingRetries) {
-        externalJobRestClient.post()
-                .uri("/acquire/jobs/{jobId}/fail", taskId)
-                .body(Map.of("workerId", workerId,"variables", variables, "retries", remainingRetries))
+    public void fail(String workerId, String taskId, int remainingRetries) {
+        var request = new FailJobRequestDto(workerId, remainingRetries);
+        externalJobRestClient
+                .post()
+                .uri("/external-job-api/acquire/jobs/{jobId}/fail", taskId)
+                .body(request)
                 .retrieve()
                 .toBodilessEntity();
     }
