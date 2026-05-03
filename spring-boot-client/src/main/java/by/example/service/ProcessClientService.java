@@ -11,10 +11,18 @@ import java.util.*;
 
 @Service
 public class ProcessClientService {
+
     private final FlowableRestClient restClient;
 
     public ProcessClientService(FlowableRestClient restClient) {
         this.restClient = restClient;
+    }
+
+    public String startMultiinstanceProcess(String businessKey) {
+        System.out.println("Business key is " + businessKey);
+        List<ProcessInstanceVariable> variables = List.of();
+        restClient.startProcess(ProcessDefinitionKey.DMN_SCHEME_INTEGRATION.getSchemeName(), businessKey, variables);
+        return businessKey;
     }
 
     public String startProcess(ProcessDefinitionKey processDefinitionKey, String businessKey, List<ProcessInstanceVariable> variables) {

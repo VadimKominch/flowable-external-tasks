@@ -70,9 +70,8 @@ public class FlowableRestClient {
 
     public void complete(String workerId, String taskId, List<ProcessInstanceVariable> variables) {
         var request = new SuccessJobRequestDto(workerId, variables);
-        externalJobRestClient
-                .post()
-                .uri("/external-job-api/acquire/jobs/{jobId}/complete", taskId)
+        externalJobRestClient.post()
+                .uri("/acquire/jobs/{jobId}/complete", taskId)
                 .body(request)
                 .retrieve()
                 .toBodilessEntity();
@@ -82,7 +81,7 @@ public class FlowableRestClient {
         var request = new FailJobRequestDto(workerId, remainingRetries);
         externalJobRestClient
                 .post()
-                .uri("/external-job-api/acquire/jobs/{jobId}/fail", taskId)
+                .uri("/acquire/jobs/{jobId}/fail", taskId)
                 .body(request)
                 .retrieve()
                 .toBodilessEntity();

@@ -1,12 +1,13 @@
 package by.example.process.jobworker;
 
 import by.example.process.client.dto.JobDto;
+import by.example.process.client.dto.ProcessInstanceVariable;
 import by.example.service.ProcessClientService;
-import org.springframework.stereotype.Component;
 
-@Component
+import java.util.List;
+
+@ExternalTask(topic = "hello-topic")
 public class HelloTaskJobWorker extends AbstractTask {
-    public static final String HELLO_TOPIC = "hello-topic";
 
 
     public HelloTaskJobWorker(ProcessClientService processService) {
@@ -14,12 +15,8 @@ public class HelloTaskJobWorker extends AbstractTask {
     }
 
     @Override
-    public String getTopic() {
-        return HELLO_TOPIC;
-    }
-
-    @Override
-    public void execute(JobDto task) throws Exception {
+    public List<ProcessInstanceVariable> execute(JobDto task) {
         System.out.println("hello");
+        return List.of();
     }
 }

@@ -12,15 +12,15 @@ import java.util.UUID;
 
 public abstract class AbstractTask {
     protected final ProcessClientService processService;
-    private final String EXTERNAL_TASK_WORKER_ID;
+    private final String externalTaskWorkerId;
     private String topic;
 
-    public AbstractTask(ProcessClientService processService) {
+    protected AbstractTask(ProcessClientService processService) {
         this.processService = processService;
-        this.EXTERNAL_TASK_WORKER_ID = UUID.randomUUID().toString();
+        this.externalTaskWorkerId = UUID.randomUUID().toString();
     }
 
-    public abstract List<ProcessInstanceVariable> execute(JobDto job) throws Exception;
+    public abstract List<ProcessInstanceVariable> execute(JobDto job) throws RuntimeException;
 
     @PostConstruct
     public void init() {
@@ -35,16 +35,18 @@ public abstract class AbstractTask {
 
     @Scheduled(fixedRate = 5000, scheduler = "flowablePool")
     public void run() {
-        List<JobDto> tasks = processService.getTasks(EXTERNAL_TASK_WORKER_ID, topic);
+
+        List<JobDto> tasks = processService.getTasks(externalTaskWorkerId, topic);
+
         tasks.forEach(
                 task -> {
                     String taskId = task.id();
                     try {
                         var variables = execute(task);
-                        processService.completeTask(EXTERNAL_TASK_WORKER_ID, taskId, variables);
+                        processService.completeTask(externalTaskWorkerId, taskId, variables);
                     } catch (Exception e) {
                         int retries = Math.max(task.retries() - 1, 0);
-                        processService.failTask(EXTERNAL_TASK_WORKER_ID, taskId, retries);
+                        processService.failTask(externalTaskWorkerId, taskId, retries);
                     }
                 });
     }
@@ -62,11 +64,15 @@ public abstract class AbstractTask {
                         .value();
     }
 
+    /**
+     * Method to extract variable from execution token. Makes unchecked conversion to parameterized
+     * type.
+     */
     protected <T> T getExecutionVariable(JobDto task, String variableName) {
         var result = task.variables().stream().filter(el -> el.name().equals(variableName)).toList();
-        if(result.isEmpty()) {
+        if (result.isEmpty()) {
             return null;
         }
-        return (T) result.get(0).value();
+        return (T) result.getFirst().value();
     }
 }

@@ -1,0 +1,59 @@
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" xmlns:flowable="http://flowable.org/dmn" xmlns:design="http://flowable.org/design" id="definition_decisiontable" name="Decision table example" namespace="http://www.flowable.org/dmn">
+  <decision id="decisiontable" name="Decision table example">
+    <decisionTable id="decisionTable_decisiontable" hitPolicy="FIRST">
+      <input label="age">
+        <inputExpression id="inputExpression_input_age" typeRef="number">
+          <text>age</text>
+        </inputExpression>
+      </input>
+      <output id="outputExpression_output_result" label="result" name="result" typeRef="string"></output>
+      <rule>
+        <inputEntry id="inputEntry_input_age_1">
+          <text><![CDATA[== 20]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_output_result_1">
+          <text><![CDATA["Hello"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_input_age_2">
+          <text><![CDATA[-]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_output_result_2">
+          <text><![CDATA["Other"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_input_age_3">
+          <text><![CDATA[-]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_output_result_3"></outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_input_age_4">
+          <text><![CDATA[-]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_output_result_4">
+          <text><![CDATA[""]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_input_age_5">
+          <text><![CDATA[-]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_output_result_5">
+          <text><![CDATA[""]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_input_age_6">
+          <text><![CDATA[-]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_output_result_6">
+          <text><![CDATA[""]]></text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI></dmndi:DMNDI>
+</definitions>
