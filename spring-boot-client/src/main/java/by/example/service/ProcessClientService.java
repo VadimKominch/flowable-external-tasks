@@ -20,7 +20,7 @@ public class ProcessClientService {
 
     public String startMultiinstanceProcess(String businessKey) {
         System.out.println("Business key is " + businessKey);
-        List<ProcessInstanceVariable> variables = List.of();
+        List<ProcessInstanceVariable> variables = new ArrayList<>();
         restClient.startProcess(ProcessDefinitionKey.DMN_SCHEME_INTEGRATION.getSchemeName(), businessKey, variables);
         return businessKey;
     }
