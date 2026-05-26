@@ -1,3 +1,8 @@
 server:
   port: 8778
   logging: false
+
+flowable:
+  process:
+    servlet:
+      load-on-startup: 1 # loads process servlets eagerly

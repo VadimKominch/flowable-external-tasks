@@ -1,11 +1,14 @@
 package by.example;
 
+import by.example.process.entity.ProcessDefinitionKey;
 import by.example.service.ProcessClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @SpringBootApplication
@@ -20,6 +23,6 @@ public class ClientRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        processService.startMultiinstanceProcess(UUID.randomUUID().toString());
+        processService.startProcess(ProcessDefinitionKey.MULTIINSTANCE, UUID.randomUUID().toString(), new ArrayList<>());
     }
 }

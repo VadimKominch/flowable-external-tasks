@@ -3,7 +3,8 @@ package by.example.process.entity;
 public enum ProcessDefinitionKey {
     EXTERNAL_TASK("externalTaskWithCorrelationExample"),
     EXCLUSIVE_GATEWAY("exclusiveGateway"),
-    DMN_SCHEME_INTEGRATION("multiinstance");
+    DMN_SCHEME_INTEGRATION("multiinstance"),
+    MULTIINSTANCE("mutiinstance");
 
     private final String schemeName;
 
