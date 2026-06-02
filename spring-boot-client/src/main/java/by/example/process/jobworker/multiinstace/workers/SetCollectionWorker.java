@@ -5,18 +5,14 @@ import by.example.process.client.dto.ProcessInstanceVariable;
 import by.example.process.jobworker.AbstractTask;
 import by.example.process.jobworker.ExternalTask;
 import by.example.service.ProcessClientService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
 
 @ExternalTask(topic = "set-collections-topic")
 public class SetCollectionWorker extends AbstractTask {
-    private final ObjectMapper objectMapper;
 
-    public SetCollectionWorker(ProcessClientService processService, ObjectMapper objectMapper) {
+    public SetCollectionWorker(ProcessClientService processService) {
         super(processService);
-        this.objectMapper = objectMapper;
     }
 
     @Override

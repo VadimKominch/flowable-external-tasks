@@ -8,7 +8,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @SpringBootApplication
@@ -23,6 +22,6 @@ public class ClientRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        processService.startProcess(ProcessDefinitionKey.MULTIINSTANCE, UUID.randomUUID().toString(), new ArrayList<>());
+        processService.startProcess(ProcessDefinitionKey.MULTIINSTANCE_SUBPROCESS_DYNAMIC_CORRELATION_KEY, UUID.randomUUID().toString(), new ArrayList<>());
     }
 }
