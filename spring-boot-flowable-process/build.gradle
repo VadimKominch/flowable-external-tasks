@@ -31,7 +31,9 @@ dependencies {
 
     implementation "org.springframework.boot:spring-boot-starter-web"
 
-//    runtimeOnly "com.h2database:h2:2.2.224"
+    // Provides the JSR-223 'groovy' script engine for BPMN groovy scriptTasks
+    implementation "org.apache.groovy:groovy-jsr223"
+
     runtimeOnly 'com.h2database:h2'
 }
 

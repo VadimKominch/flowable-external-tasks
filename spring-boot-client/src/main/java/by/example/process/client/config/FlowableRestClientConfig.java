@@ -10,7 +10,7 @@ public class FlowableRestClientConfig {
     @Bean("flowableRestClientBase")
     public RestClient flowableRestClientBase() {
         return RestClient.builder()
-                .baseUrl("http://localhost:8080/process-api")
+                .baseUrl("http://localhost:8081/process-api")
                 .defaultHeaders(headers ->
                         headers.setBasicAuth("rest-admin", "test"))
                 .build();
@@ -19,7 +19,7 @@ public class FlowableRestClientConfig {
     @Bean("flowableRestClientExternalJob")
     public RestClient flowableRestClientExternalJobs() {
         return RestClient.builder()
-                .baseUrl("http://localhost:8080/external-job-api")
+                .baseUrl("http://localhost:8081/external-job-api")
                 .defaultHeaders(headers ->
                         headers.setBasicAuth("rest-admin", "test"))
                 .build();

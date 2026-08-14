@@ -8,6 +8,7 @@ public enum ProcessDefinitionKey {
     MULTIINSTANCE("mutiinstance"),
     DYNAMIC_KEY("dynamicKey"),
     OPTIONAL_EXECUTION("optionalExecution"),
+    SCRIPT_TASK("scriptTask"),
     ;
 
     private final String schemeName;

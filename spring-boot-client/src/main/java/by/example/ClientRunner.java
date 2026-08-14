@@ -9,6 +9,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @SpringBootApplication
@@ -27,9 +28,11 @@ public class ClientRunner implements CommandLineRunner {
 //        processService.startProcess(ProcessDefinitionKey.DYNAMIC_KEY, UUID.randomUUID().toString(), new ArrayList<>(){{
 //            add(new ProcessInstanceVariable("choice", "integer", 3));
 //        }});
-        processService.startProcess(ProcessDefinitionKey.OPTIONAL_EXECUTION, UUID.randomUUID().toString(), new ArrayList<>(){{
-            add(new ProcessInstanceVariable("isFirstRequired", "boolean", true));
-            add(new ProcessInstanceVariable("isRequired", "boolean", false));
-        }});
+//        processService.startProcess(ProcessDefinitionKey.OPTIONAL_EXECUTION, UUID.randomUUID().toString(), new ArrayList<>(){{
+//            add(new ProcessInstanceVariable("isFirstRequired", "boolean", true));
+//            add(new ProcessInstanceVariable("isRequired", "boolean", false));
+//        }});
+
+        processService.startProcess(ProcessDefinitionKey.SCRIPT_TASK, UUID.randomUUID().toString(), new ArrayList<>());
     }
 }
