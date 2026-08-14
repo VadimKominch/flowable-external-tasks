@@ -1,5 +1,6 @@
 package by.example;
 
+import by.example.process.client.dto.ProcessInstanceVariable;
 import by.example.process.entity.ProcessDefinitionKey;
 import by.example.service.ProcessClientService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,13 @@ public class ClientRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        processService.startProcess(ProcessDefinitionKey.MULTIINSTANCE_SUBPROCESS_DYNAMIC_CORRELATION_KEY, UUID.randomUUID().toString(), new ArrayList<>());
+//        processService.startProcess(ProcessDefinitionKey.MULTIINSTANCE_SUBPROCESS_DYNAMIC_CORRELATION_KEY, UUID.randomUUID().toString(), new ArrayList<>());
+//        processService.startProcess(ProcessDefinitionKey.DYNAMIC_KEY, UUID.randomUUID().toString(), new ArrayList<>(){{
+//            add(new ProcessInstanceVariable("choice", "integer", 3));
+//        }});
+        processService.startProcess(ProcessDefinitionKey.OPTIONAL_EXECUTION, UUID.randomUUID().toString(), new ArrayList<>(){{
+            add(new ProcessInstanceVariable("isFirstRequired", "boolean", true));
+            add(new ProcessInstanceVariable("isRequired", "boolean", false));
+        }});
     }
 }
